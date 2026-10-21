@@ -1,6 +1,56 @@
 [
- {"id":"demo-1","title":"Bandolera negra de demostración","brand":"Marca de ejemplo","category":"Accesorios","subcategory":"Bolsos","price":22500,"compareAtPrice":null,"offer":false,"available":true,"sku":"DEMO-001","description":"Producto ficticio para probar el catálogo.","image":"","updatedAt":"2026-10-20T12:00:00-06:00","variants":[{"title":"Única","available":true}],"tags":["bolso"]},
- {"id":"demo-2","title":"Bolso blanco de demostración","brand":"Marca de ejemplo","category":"Mujer","subcategory":"Bolsos","price":34300,"compareAtPrice":null,"offer":false,"available":true,"sku":"DEMO-002","description":"Producto ficticio para probar el catálogo.","image":"","updatedAt":"2026-10-20T11:00:00-06:00","variants":[{"title":"Única","available":true}],"tags":["bolso"]},
- {"id":"demo-3","title":"Tenis casuales de demostración","brand":"Marca deportiva","category":"Mujer","subcategory":"Calzado","price":28900,"compareAtPrice":35900,"offer":true,"available":true,"sku":"DEMO-003","description":"Producto ficticio de oferta. Se muestra únicamente el precio original tachado.","image":"","updatedAt":"2026-10-19T10:00:00-06:00","variants":[{"title":"37","available":true},{"title":"38","available":true}],"tags":["oferta"]},
- {"id":"demo-4","title":"Mochila de demostración","brand":"Marca de ejemplo","category":"Hombre","subcategory":"Mochilas","price":26500,"compareAtPrice":null,"offer":false,"available":false,"sku":"DEMO-004","description":"Producto ficticio para probar estados de inventario.","image":"","updatedAt":"2026-10-18T10:00:00-06:00","variants":[],"tags":["mochila"]}
+  {
+    "id": "8255901368354",
+    "title": "BANDOLERA KENNETH COLE",
+    "brand": "KENNETH COLE",
+    "category": "BOLSO",
+    "subcategory": "Bandoleras",
+    "price": 22500,
+    "compareAtPrice": null,
+    "offer": false,
+    "available": true,
+    "sku": "KCM1304.BLK.UT",
+    "description": "BANDOLERA KENNETH COLE COLOR NEGRO UNISEX 100% POLIÉSTER.",
+    "image": "https://cdn.shopify.com/s/files/1/0792/3715/2802/files/WhatsAppImage2026-02-26at11.02.57AM.jpg?v=1772135593",
+    "updatedAt": "2026-10-20T12:47:00-06:00",
+    "url": "https://eltigrecr.com/products/bandolera-kenneth-cole",
+    "variants": [
+      {
+        "title": "UNITALLA",
+        "available": true
+      }
+    ],
+    "tags": [
+      "ACCESORIOS",
+      "BOLSO",
+      "KENNETH COLE"
+    ]
+  },
+  {
+    "id": "8255670452258",
+    "title": "BOLSO NINE WEST",
+    "brand": "NINE WEST",
+    "category": "BOLSO",
+    "subcategory": "Bolsos para dama",
+    "price": 34300,
+    "compareAtPrice": null,
+    "offer": false,
+    "available": true,
+    "sku": "515809.MIL.UT",
+    "description": "BOLSO NINE WEST COLOR BLANCO PARA DAMA",
+    "image": "https://cdn.shopify.com/s/files/1/0792/3715/2802/files/515809MIL-1.png?v=1775856454",
+    "updatedAt": "2026-10-20T12:47:00-06:00",
+    "url": "https://eltigrecr.com/products/bolso-nine-west-6",
+    "variants": [
+      {
+        "title": "UNICA",
+        "available": true
+      }
+    ],
+    "tags": [
+      "ACCESORIOS",
+      "BOLSO",
+      "NINE WEST"
+    ]
+  }
 ]
