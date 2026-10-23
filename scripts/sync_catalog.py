@@ -6,21 +6,6 @@ import os
 SOURCE_URL = "https://eltigrecr.com/products.json?limit=250&page="
 DATA_FILE = "data/catalog_data.json"
 
-def apply_custom_rounding(amount):
-    """
-    Divide entre 1.1 y redondea:
-    Si pasa de 50 colones en la centena (ej: x.x50), sube al centenar (x.x00 + 100).
-    Si es menor a 50 (ej: x.x49), baja al centenar (x.x00).
-    """
-    base_calc = amount / 1.1
-    hundreds = int(base_calc // 100) * 100
-    remainder = base_calc - hundreds
-    
-    if remainder >= 50:
-        return hundreds + 100
-    else:
-        return hundreds
-
 def detect_subcat(title_lower, type_lower, tags_lower):
     if any(k in title_lower or k in type_lower or k in tags_lower for k in ['zapato', 'zapatos', 'tenis', 'sandalia', 'sandalias', 'calzado', 'bota', 'tacón', 'tacon', 'plataforma', 'pantufla']): return "CALZADO"
     if any(k in title_lower or k in type_lower or k in tags_lower for k in ['blazer', 'cardigan', 'sueter', 'abrigo', 'jacket']): return "ABRIGOS Y JACKETS"
@@ -101,14 +86,7 @@ def fetch_all_products():
                     
                     is_offer = compare_at > price or any(k in tags_lower or k in title_lower for k in ['oferta', 'liquidación', 'liquidacion', 'descuento', 'promo', 'sale'])
                     
-                    # PRECIO BASE MAYOR (ignora completamente el precio rojo de oferta del proveedor)
-                    base_price = max(price, compare_at)
-                    
-                    # SI ES OFERTA: Aplica la fórmula dividiendo entre 1.1 y redondeando
-                    if is_offer and base_price > 0:
-                        offer_price = apply_custom_rounding(base_price)
-                    else:
-                        offer_price = base_price
+                    regular_price = max(price, compare_at)
                     
                     sizes = []
                     for v in variants:
@@ -123,4 +101,35 @@ def fetch_all_products():
                         "id": p.get('id'),
                         "name": title,
                         "brand": "G&EE",
-                        "sku": first_var.get('
+                        "sku": first_var.get('sku', ''),
+                        "category": category,
+                        "subcategory": subcat,
+                        "regular_price": regular_price,
+                        "is_offer": is_offer,
+                        "available_sizes": sizes,
+                        "image_url": img_url,
+                        "updated_at": p.get('updated_at')
+                    }
+                    all_products.append(item)
+                    
+                page += 1
+                if page > 60:
+                    break
+        except Exception as e:
+            break
+            
+    return all_products
+
+def main():
+    os.makedirs("data", exist_ok=True)
+    products = fetch_all_products()
+    payload = {
+        "last_sync": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+        "total_items": len(products),
+        "products": products
+    }
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+
+if __name__ == "__main__":
+    main()
