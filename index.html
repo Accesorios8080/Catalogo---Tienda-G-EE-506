@@ -1,9 +1,392 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#102235"><meta name="description" content="G&EE - Moda y accesorios en Costa Rica"><title>G&EE | Catálogo</title><link rel="stylesheet" href="styles.css"></head><body>
-<header class="top"><div class="wrap topbar"><a class="logo" href="./" aria-label="G y EE, inicio">G<span>&</span>EE<small>Moda y accesorios</small></a><form id="searchForm" role="search"><input id="search" type="search" placeholder="Buscar productos, marcas o categorías..." aria-label="Buscar productos"><button type="submit">Buscar</button></form><button id="menuButton" class="menuButton" aria-expanded="false" aria-controls="nav">☰ Menú</button></div></header>
-<nav id="nav" class="nav" aria-label="Categorías"><div class="wrap" id="navContent"></div></nav>
-<main class="wrap"><section class="hero"><div><p class="eyebrow">G&EE · COSTA RICA</p><h1>Estilo para cada día</h1><p>Explorá nuestro catálogo de moda y accesorios.</p><a href="#catalogo" class="cta">Ver productos →</a></div><div class="heroart" aria-hidden="true">G<span>&</span>EE</div></section>
-<section id="catalogo" class="catalog"><div class="sectiontitle"><div><p class="eyebrow">ENCONTRÁ TU ESTILO</p><h2 id="heading">Todos los productos</h2><p id="status" class="muted" aria-live="polite"></p></div><button id="reset" class="textbutton">Ver todos</button></div>
-<div class="layout"><aside class="filters"><h3>Filtros</h3><label for="category">Categoría</label><select id="category"><option value="">Todas</option></select><label for="subcategory">Subcategoría</label><select id="subcategory"><option value="">Todas</option></select><label for="brand">Marca</label><select id="brand"><option value="">Todas</option></select><label for="sort">Ordenar</label><select id="sort"><option value="new">Más recientes</option><option value="priceAsc">Precio: menor a mayor</option><option value="priceDesc">Precio: mayor a menor</option><option value="name">Nombre A–Z</option></select><label class="check"><input id="available" type="checkbox"> Solo disponibles</label></aside><div><div id="products" class="products"></div><div id="empty" class="empty" hidden>No encontramos productos con estos filtros.</div><div class="pagination"><button id="prev">← Anterior</button><span id="pageInfo"></span><button id="next">Siguiente →</button></div></div></div></section></main>
-<footer><div class="wrap foot"><strong>G&EE</strong><p>Catálogo de moda y accesorios · Precios en colones costarricenses (₡)</p><p class="muted">Las existencias deben confirmarse antes de comprar. G&EE es un proyecto independiente.</p></div></footer>
-<dialog id="detail"><button id="closeDialog" class="close" aria-label="Cerrar">✕</button><div id="detailContent"></div></dialog>
-<script src="app.js" defer></script></body></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>G&EE - Catálogo Digital</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0a192f;
+      --accent: #0d9488;
+      --sale: #00b4d8;
+      --bg: #ffffff;
+      --bg-sec: #f8fafc;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 60px; }
+
+    .top-promo { background: #16a34a; color: white; text-align: center; padding: 10px 12px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; }
+
+    header { background: #ffffff; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .header-main { max-width: 1300px; margin: 0 auto; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 1.8rem; font-weight: 800; color: var(--primary); text-decoration: none; }
+    .logo span { color: var(--accent); }
+
+    .nav-bar { background: #ffffff; border-top: 1px solid var(--border); position: relative; }
+    .nav-container { max-width: 1300px; margin: 0 auto; display: flex; justify-content: center; gap: 20px; padding: 0 16px; flex-wrap: wrap; }
+    
+    .nav-item { position: static; padding: 14px 0; }
+    .nav-btn { font-size: 0.85rem; font-weight: 800; color: #334155; cursor: pointer; border: none; background: none; text-transform: uppercase; letter-spacing: 1px; }
+    .nav-btn:hover { color: var(--accent); }
+    .nav-btn.sale { color: #00b4d8; text-decoration: underline; text-underline-offset: 4px; }
+
+    .mega-menu { 
+      display: none; 
+      position: absolute; 
+      top: 100%; 
+      left: 0; 
+      right: 0;
+      width: 100%; 
+      background: #ffffff !important; 
+      border-top: 2px solid var(--accent);
+      border-bottom: 2px solid var(--border);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.18); 
+      padding: 30px 40px; 
+      z-index: 99999 !important; 
+    }
+    .nav-item:hover .mega-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; max-width: 1300px; margin: 0 auto; }
+
+    .menu-col h4 { font-size: 0.82rem; font-weight: 800; color: #0f172a; text-transform: uppercase; margin-bottom: 14px; border-bottom: 2px solid var(--bg-sec); padding-bottom: 6px; }
+    .menu-col a { display: block; font-size: 0.8rem; font-weight: 600; color: #475569; text-decoration: none; margin-bottom: 10px; text-transform: uppercase; transition: color 0.15s; }
+    .menu-col a:hover { color: var(--accent); font-weight: 700; }
+
+    .main-container { max-width: 1300px; margin: 24px auto; padding: 0 16px; display: grid; grid-template-columns: 220px 1fr; gap: 24px; position: relative; z-index: 1; }
+    @media (max-width: 850px) { .main-container { grid-template-columns: 1fr; } }
+
+    .sidebar { background: var(--bg-sec); border: 1px solid var(--border); border-radius: 10px; padding: 16px; height: fit-content; }
+    .filter-title { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; }
+    .filter-group { margin-bottom: 14px; }
+    .filter-group label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+    select, input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+    .card { background: white; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; position: relative; }
+    .card:hover { transform: translateY(-3px); }
+    .badge { position: absolute; top: 8px; left: 8px; background: #00b4d8; color: white; font-size: 0.65rem; font-weight: 800; padding: 3px 6px; border-radius: 4px; z-index: 2; }
+    .card-img-wrap { width: 100%; aspect-ratio: 1/1; background: #f1f5f9; }
+    .card-img { width: 100%; height: 100%; object-fit: cover; }
+    .card-body { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; }
+    .card-sku { font-size: 0.65rem; font-weight: 700; color: var(--accent); }
+    .card-title { font-size: 0.8rem; font-weight: 600; margin: 4px 0; height: 2.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .card-sizes { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
+    .price { font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-top: auto; }
+
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 32px; flex-wrap: wrap; }
+    .page-btn { padding: 8px 12px; border: 1px solid var(--border); background: white; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer; color: var(--text); }
+    .page-btn:hover { background: var(--bg-sec); border-color: var(--accent); }
+    .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:100000; }
+    .modal-box { background:white; padding:20px; border-radius:12px; max-width:400px; width:90%; position:relative; }
+    .modal-close { position:absolute; top:10px; right:12px; border:none; background:none; font-size:1.4rem; cursor:pointer; }
+  </style>
+</head>
+<body>
+
+  <div class="top-promo">🎁 Recomienda Tienda G&EE a 5 personas y gana un cupón de descuento especial</div>
+
+  <header>
+    <div class="header-main">
+      <a href="javascript:void(0)" class="logo" onclick="filterBy(event, 'ALL', 'ALL')">G<span>&</span>EE</a>
+      <input type="text" id="search" placeholder="Buscar prenda, SKU, talla..." style="max-width:300px;">
+    </div>
+    <nav class="nav-bar">
+      <div class="nav-container">
+        
+        <div class="nav-item"><button class="nav-btn" onclick="filterBy(event, 'LEVI\'S', 'ALL')">LEVI'S</button></div>
+
+        <div class="nav-item">
+          <button class="nav-btn" onclick="filterBy(event, 'DAMA', 'ALL')">DAMA</button>
+          <div class="mega-menu">
+            <div class="menu-col">
+              <h4>Prenda Superior</h4>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'DAMA', 'BLUSAS')">Blusas</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'DAMA', 'CAMISAS')">Camisas</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'DAMA', 'CAMISETAS')">Camisetas</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'DAMA', 'POLO')">Polo</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'DAMA', 'ABRIGOS Y JACKETS')">Abrigos y Jackets</a>
+            </div>
+            <div class="menu-col">
+              <h4>Prenda Inferior</h4>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'DAMA', 'JEANS')">Jeans</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'DAMA', 'PANTALONES')">Pantalones</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'DAMA', 'SHORTS')">Shorts</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'DAMA', 'ENAGUAS')">Enaguas</a>
+            </div>
+            <div class="menu-col">
+              <h4>Completos</h4>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'DAMA', 'VESTIDOS')">Vestidos</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'DAMA', 'ENTERIZOS')">Enterizos</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'DAMA', 'CONJUNTO')">Conjunto</a>
+            </div>
+            <div class="menu-col">
+              <h4>Otros</h4>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'DAMA', 'OTROS')">Otros</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-item">
+          <button class="nav-btn" onclick="filterBy(event, 'CABALLERO', 'ALL')">CABALLERO</button>
+          <div class="mega-menu">
+            <div class="menu-col">
+              <h4>Prenda Superior</h4>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'CABALLERO', 'CAMISAS')">Camisas</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'CABALLERO', 'CAMISETAS')">Camisetas</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'CABALLERO', 'POLO')">Polo</a>
+            </div>
+            <div class="menu-col">
+              <h4>Prenda Inferior</h4>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'CABALLERO', 'JEANS')">Jeans</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'CABALLERO', 'PANTALONES')">Pantalones</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'CABALLERO', 'SHORTS')">Shorts</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-item"><button class="nav-btn" onclick="filterBy(event, 'CALZADO', 'ALL')">CALZADO</button></div>
+        <div class="nav-item"><button class="nav-btn" onclick="filterBy(event, 'NIÑA', 'ALL')">NIÑA</button></div>
+        <div class="nav-item"><button class="nav-btn" onclick="filterBy(event, 'NIÑO', 'ALL')">NIÑO</button></div>
+
+        <div class="nav-item">
+          <button class="nav-btn sale" onclick="filterBy(event, 'OFERTA', 'ALL')">OFERTA</button>
+          <div class="mega-menu">
+            <div class="menu-col">
+              <h4>Oferta Hombre</h4>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'OFERTA_HOMBRE', 'CAMISAS')">Camisas</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'OFERTA_HOMBRE', 'CAMISETAS')">Camisetas</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'OFERTA_HOMBRE', 'JEANS')">Jeans</a>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'OFERTA_HOMBRE', 'SHORTS')">Short</a>
+            </div>
+            <div class="menu-col">
+              <h4>Calzado Oferta</h4>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'OFERTA_CALZADO', 'ALL')">Ver Calzado Oferta</a>
+            </div>
+            <div class="menu-col">
+              <h4>Levi's Oferta</h4>
+              <a href="javascript:void(0)" onclick="filterBy(event, 'OFERTA_LEVIS', 'ALL')">Ver Levi's Oferta</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </nav>
+  </header>
+
+  <div class="main-container">
+    <aside class="sidebar">
+      <div class="filter-title">Filtros</div>
+      <div class="filter-group">
+        <label>Talla</label>
+        <select id="size-select"><option value="ALL">Todas las tallas</option></select>
+      </div>
+      <div class="filter-group">
+        <label>Orden</label>
+        <select id="sort-select">
+          <option value="asc">Precio: Menor a Mayor</option>
+          <option value="desc">Precio: Mayor a Menor</option>
+        </select>
+      </div>
+    </aside>
+
+    <main>
+      <div style="margin-bottom:12px; font-size:0.85rem; font-weight:700;" id="status-text">Cargando catálogo...</div>
+      <div class="grid" id="product-grid"></div>
+      <div class="pagination" id="pagination"></div>
+    </main>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <img id="m-img" src="" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px; margin-bottom:10px;">
+      <div id="m-sku" style="font-size:0.75rem; font-weight:700; color:var(--accent);"></div>
+      <h3 id="m-title" style="font-size:0.95rem; margin:4px 0;"></h3>
+      <div id="m-price" style="font-size:1.1rem; font-weight:800; color:var(--primary); margin-bottom:8px;"></div>
+      <div id="m-sizes" style="font-size:0.8rem; color:var(--text-muted);"></div>
+    </div>
+  </div>
+
+  <script>
+    let products = [], filtered = [], selectedCat = 'ALL', selectedSub = 'ALL';
+    let currentPage = 1;
+    const itemsPerPage = 24;
+
+    function norm(str) { return (str || '').toString().toUpperCase().trim(); }
+
+    async function init() {
+      try {
+        const res = await fetch('data/catalog_data.json');
+        const data = await res.json();
+        products = data.products || [];
+        populateSizes();
+        applyFilters();
+      } catch(e) {
+        document.getElementById('status-text').innerText = 'Cargando datos del catálogo...';
+      }
+    }
+
+    function populateSizes() {
+      const set = new Set();
+      products.forEach(p => (p.available_sizes||[]).forEach(s => set.add(s)));
+      const sel = document.getElementById('size-select');
+      [...set].sort().forEach(s => {
+        const o = document.createElement('option'); o.value = s; o.textContent = s; sel.appendChild(o);
+      });
+    }
+
+    function filterBy(e, cat, sub) {
+      if(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      selectedCat = cat; 
+      selectedSub = sub;
+      currentPage = 1;
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const q = norm(document.getElementById('search').value);
+      const sz = document.getElementById('size-select').value;
+      const sort = document.getElementById('sort-select').value;
+
+      filtered = products.filter(p => {
+        const pCat = norm(p.category);
+        const pSub = norm(p.subcategory);
+        const pName = norm(p.name);
+        const pSku = norm(p.sku);
+
+        let matchCat = true;
+        if (selectedCat === 'CALZADO') {
+          matchCat = pCat === 'CALZADO' || pSub === 'CALZADO';
+        } else if (selectedCat === 'OFERTA') {
+          matchCat = p.is_offer;
+        } else if (selectedCat === 'OFERTA_HOMBRE') {
+          matchCat = p.is_offer && pCat === 'CABALLERO';
+        } else if (selectedCat === 'OFERTA_CALZADO') {
+          matchCat = p.is_offer && (pCat === 'CALZADO' || pSub === 'CALZADO');
+        } else if (selectedCat === 'OFERTA_LEVIS') {
+          matchCat = p.is_offer && pCat === "LEVI'S";
+        } else if (selectedCat !== 'ALL') {
+          matchCat = pCat === norm(selectedCat);
+        }
+
+        let matchSub = selectedSub === 'ALL' || pSub === norm(selectedSub);
+        let matchSz = sz === 'ALL' || (p.available_sizes||[]).some(s => norm(s) === norm(sz));
+        let matchQ = !q || pName.includes(q) || pSku.includes(q);
+
+        return matchCat && matchSub && matchSz && matchQ;
+      });
+
+      if (selectedCat === 'ALL' && !document.getElementById('search').value) {
+        filtered.sort((a, b) => {
+          const aIsAccessory = (a.subcategory === 'OTROS' || a.name.toLowerCase().includes('calceta') || a.name.toLowerCase().includes('media'));
+          const bIsAccessory = (b.subcategory === 'OTROS' || b.name.toLowerCase().includes('calceta') || b.name.toLowerCase().includes('media'));
+          if (aIsAccessory && !bIsAccessory) return 1;
+          if (!aIsAccessory && bIsAccessory) return -1;
+          return 0;
+        });
+      } else {
+        if (sort === 'asc') filtered.sort((a,b) => a.regular_price - b.regular_price);
+        else filtered.sort((a,b) => b.regular_price - a.regular_price);
+      }
+
+      render();
+    }
+
+    function render() {
+      const grid = document.getElementById('product-grid'); grid.innerHTML = '';
+      document.getElementById('status-text').innerText = `${filtered.length} productos disponibles`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1; padding:40px; text-align:center; color:var(--text-muted);">No hay productos disponibles en esta sección por el momento.</div>';
+        document.getElementById('pagination').innerHTML = '';
+        return;
+      }
+
+      const start = (currentPage - 1) * itemsPerPage;
+      const pageItems = filtered.slice(start, start + itemsPerPage);
+
+      pageItems.forEach(p => {
+        const card = document.createElement('div'); card.className = 'card';
+        card.onclick = () => openModal(p);
+        const fmtPrice = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(p.regular_price);
+        const sizesText = (p.available_sizes && p.available_sizes.length > 0) ? `Tallas: ${p.available_sizes.join(', ')}` : 'Tallas: Única';
+
+        card.innerHTML = `
+          ${p.is_offer ? `<div class="badge">OFERTA</div>` : ''}
+          <div class="card-img-wrap"><img class="card-img" src="${p.image_url}" loading="lazy"></div>
+          <div class="card-body">
+            <div class="card-sku">SKU: ${p.sku||'N/A'}</div>
+            <div class="card-title">${p.name}</div>
+            <div class="card-sizes">${sizesText}</div>
+            <div class="price">${fmtPrice}</div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      renderPagination();
+    }
+
+    function renderPagination() {
+      const totalPages = Math.ceil(filtered.length / itemsPerPage);
+      const container = document.getElementById('pagination');
+      container.innerHTML = '';
+
+      if (totalPages <= 1) return;
+
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'page-btn';
+      prevBtn.innerText = '« Anterior';
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => { currentPage--; render(); window.scrollTo({top: 0, behavior: 'smooth'}); };
+      container.appendChild(prevBtn);
+
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+          const btn = document.createElement('button');
+          btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+          btn.innerText = i;
+          btn.onclick = () => { currentPage = i; render(); window.scrollTo({top: 0, behavior: 'smooth'}); };
+          container.appendChild(btn);
+        } else if (i === currentPage - 3 || i === currentPage + 3) {
+          const dots = document.createElement('span');
+          dots.innerText = '...';
+          dots.style.padding = '0 4px';
+          container.appendChild(dots);
+        }
+      }
+
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'page-btn';
+      nextBtn.innerText = 'Siguiente »';
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = () => { currentPage++; render(); window.scrollTo({top: 0, behavior: 'smooth'}); };
+      container.appendChild(nextBtn);
+    }
+
+    function openModal(p) {
+      document.getElementById('m-img').src = p.image_url;
+      document.getElementById('m-sku').innerText = `SKU: ${p.sku||'N/A'}`;
+      document.getElementById('m-title').innerText = p.name;
+      document.getElementById('m-price').innerText = new Intl.NumberFormat('es-CR', { style: 'currency', currency: 'CRC' }).format(p.regular_price);
+      document.getElementById('m-sizes').innerText = `Tallas disponibles: ${(p.available_sizes||[]).join(', ') || 'Única'}`;
+      document.getElementById('modal').style.display = 'flex';
+    }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+    document.getElementById('search').addEventListener('input', () => { currentPage = 1; applyFilters(); });
+    document.getElementById('size-select').addEventListener('change', () => { currentPage = 1; applyFilters(); });
+    document.getElementById('sort-select').addEventListener('change', () => { currentPage = 1; applyFilters(); });
+
+    init();
+  </script>
+</body>
+</html>
