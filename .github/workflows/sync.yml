@@ -27,5 +27,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data/catalog_data.json
-          git commit -m "Sincronización automática de inventario" || exit 0
-          git push
+          git commit -m "Sincronización automática de inventario" || echo "No hay cambios para commitear"
+          git push || echo "No hay cambios para pushear"
