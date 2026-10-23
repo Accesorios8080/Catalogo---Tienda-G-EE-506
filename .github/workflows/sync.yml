@@ -1,27 +1,31 @@
 name: Sincronizar catálogo autorizado
+
 on:
-  workflow_dispatch:
   schedule:
-    - cron: '17 */6 * * *'
-permissions:
-  contents: write
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
 jobs:
   sync:
-    if: vars.CATALOG_AUTHORIZED == 'yes'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout del repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
-      - name: Sincronizar
-        env:
-          CATALOG_AUTHORIZED: ${{ vars.CATALOG_AUTHORIZED }}
-          CATALOG_SOURCE_URL: ${{ vars.CATALOG_SOURCE_URL }}
+          python-version: '3.x'
+
+      - name: Ejecutar script de sincronización
         run: python scripts/sync_catalog.py
-      - name: Guardar cambios
+
+      - name: Guardar cambios en GitHub
         run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/products.json
-          git diff --cached --quiet || (git commit -m 'Actualizar catálogo' && git push)
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/catalog_data.json
+          git commit -m "Sincronización automática de inventario" || exit 0
+          git push
